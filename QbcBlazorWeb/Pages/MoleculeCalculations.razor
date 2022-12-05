@@ -1,0 +1,178 @@
+﻿@page "/moleculemodelcalculations/{currentmodelid}"
+@inject IChemicalModelService ModelService
+@inject IChemicalCalculationService CalculationService
+@inject IMoleculeService MoleculesService
+@inject NavigationManager NavigationManager
+
+<hr class="line" />
+<div class="container">
+    <section class="row">
+        <div class="col">
+            <div class="d-flex flex-row align-items-center">
+                <h3>Update Model</h3>
+                <a href="moleculemodels/@CurrentModelId" class="badge badge-light ml-1">Go to Model List</a>
+            </div>
+            <EditForm Model="@_moleculeModelModel" OnSubmit="@OnHandleSubmitUpdateModelAsync">
+                <div class="form-group">
+                    <label for="modelname">Name:</label>
+                    <InputText class="form-control" id="modelname" @bind-Value="_moleculeModelModel.Name" />
+                </div>
+                <div class="form-group">
+                    <label for="modeldescription">Description:</label>
+                    <InputTextArea rows="5" class="form-control" id="modeldescription" @bind-Value="_moleculeModelModel.Description"></InputTextArea>
+                </div>
+                <div class="form-group">
+                    <label for="charge">Charge:</label>
+                    <InputNumber class="form-control" @bind-Value="_moleculeModelModel.Charge" id="charge"></InputNumber>
+                </div>
+                <div class="form-group">
+                    <label for="modelinitialgeometry">Initial Geometry:</label>
+                    <InputTextArea wrap="" rows="5" class="form-control" id="modelinitialgeometry" @bind-Value="_moleculeModelModel.InitialGeometry"></InputTextArea>
+                </div>
+                <div class="form-group">
+                    <label for="modelcurrentgeometry">Current Geometry:</label>
+                    <InputTextArea wrap="" rows="5" class="form-control" id="modelcurrentgeometry" @bind-Value="_moleculeModelModel.CurrentGeometry"></InputTextArea>
+                </div>
+                @if (this.ChemicalCalculationsList.Count == 0)
+                {
+                    <button type="button" @onclick="@OnDeleteModelAsync" class="btn btn-primary">Delete</button>
+                }
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </EditForm>
+        </div>
+        <div class="col">            
+            <div class="d-flex flex-row align-items-center">
+                <h3>Calculations</h3>
+                <a href="moleculecalculationsmanager/0/model/@CurrentModelId" class="badge badge-light ml-1">New Calculation</a>
+            </div>
+            <div class="list-group">
+                @foreach (var calc in this.ChemicalCalculationsList)
+                {
+                   <a href="moleculecalculationsmanager/@calc.Id/model/@CurrentModelId" class="list-group-item list-group-item-action">
+                       <div class="d-flex w-100 justify-content-between">
+                           <p>
+                               @calc.Id <h5 class="mb-1">@calc.Name</h5>
+                           </p>    
+                       </div>
+                       <p class="mb-1">@calc.Description</p>
+                       <p>Status : <b>@calc.Status.ToString()</b></p>
+                   </a>
+                }
+            </div>
+        </div>
+        <div class="col">
+            <div class="d-flex flex-row align-items-center">
+                <h3>Molecules</h3>
+                <button type="button" @onclick="@OnMergeMoleculesAsync" class="badge badge-light ml-1">Merge Molecules</button>
+            </div>
+            <div class="list-group">
+                @foreach (var molecule in this.ChemicalMoleculesList)
+                {
+                    <a href="moleculeexplorer/@molecule.Id" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">@molecule.NameInfo</h5>
+                        </div>
+                        <p>Calculation @molecule.ParentCalculationId</p>
+                        <p>Model : @molecule.ModelId. @_moleculeModelModel.Name.</p>
+                    </a>
+                }
+            </div>
+        </div>
+</section>
+</div>
+@code {
+
+    [Parameter]
+    public string CurrentModelId { get; set; }
+
+    private ChemicalModelInputModel _moleculeModelModel { get; set; }
+
+    private List<ChemicalCalculation> ChemicalCalculationsList { get; set; }
+
+    private List<MoleculeInfo>  ChemicalMoleculesList { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (int.TryParse(this.CurrentModelId, out int modelid))
+        {
+            var result = await this.ModelService.Get(modelid);
+            if (result != null)
+            {
+                this._moleculeModelModel.Id = result.Id;
+                this._moleculeModelModel.Name = result.Name;
+                this._moleculeModelModel.Description = result.Description;
+                this._moleculeModelModel.Charge = result.Charge;
+                this._moleculeModelModel.InitialGeometry = result.InitialGeometry;
+                this._moleculeModelModel.CurrentGeometry = result.CurrentGeometry;
+            }
+
+            if ( result.Calculations?.Any() == true)
+            {
+                this.ChemicalCalculationsList.AddRange(from c in result.Calculations where c.HasParent == false orderby c.Id ascending, c.Name ascending select c);
+            }
+
+            var molecules = await this.MoleculesService.GetByModelID(modelid);
+            if ( molecules?.Any() == true)
+            {
+                this.ChemicalMoleculesList.AddRange(from m in molecules orderby m.ModelId ascending , m.ParentCalculationId ascending, m.NameInfo ascending select m);
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Init();
+
+
+        await Task.CompletedTask;
+    }
+
+    private async Task OnHandleSubmitUpdateModelAsync()
+    {
+        if (int.TryParse(this.CurrentModelId, out int modelid))
+        {
+            await this.ModelService.UpdateAsync(modelid, new ChemicalModel()
+            {
+                Description = this._moleculeModelModel.Description,
+                Name = this._moleculeModelModel.Name,
+                Id = this._moleculeModelModel.Id,
+                Charge = this._moleculeModelModel.Charge,
+                CurrentGeometry = this._moleculeModelModel.CurrentGeometry,
+                InitialGeometry = this._moleculeModelModel.InitialGeometry,
+                ProjectID = this._moleculeModelModel.ProjectId
+            });
+        }
+    }
+
+    private async Task OnDeleteModelAsync()
+    {
+        if (int.TryParse(this.CurrentModelId, out int modelid))
+        {
+            await this.ModelService.DeleteAsync(modelid);
+            NavigationManager.NavigateTo($"moleculemodels/{modelid}");
+        }
+    }
+
+    private async Task OnMergeMoleculesAsync()
+    {
+        if (int.TryParse(this.CurrentModelId, out int modelid))
+        {
+            var result = await this.ModelService.MergeMolecules(modelid);
+            if ( result?.Any() == true)
+            {
+                result.AddRange(this.ChemicalMoleculesList);
+                this.ChemicalMoleculesList.Clear();
+                this.ChemicalMoleculesList.AddRange(from m in result orderby m.ModelId ascending , m.ParentCalculationId ascending, m.NameInfo select m);
+            }
+        }
+    }
+
+    private void Init()
+    {
+        this._moleculeModelModel = new ChemicalModelInputModel();
+        this.ChemicalCalculationsList = new List<ChemicalCalculation>();
+        this.ChemicalMoleculesList = new List<MoleculeInfo>();
+
+    }
+
+}

@@ -1,0 +1,45 @@
+﻿
+@{
+    ViewData["Title"] = "MoleculesCalculation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model QbcWeb.Models.ChemicalCalculationViewModel;
+
+<div class="pure-g">
+    <div class="pure-u-1-3">
+        <div class="leftbox">
+            <h2>Chemical Model</h2>
+            <a title="Go to model" asp-controller="MoleculesModel" asp-action="Index" asp-route-id=@Model.ModelId>@Model.ChemicalModelName</a>
+        </div>
+    </div>
+    <div class="pure-u-1-3">
+        <form asp-controller="MoleculesCalculation" asp-action="SaveCalculation" method="post" class="pure-form pure-form-stacked">
+            <table>
+                <tr>
+                    <td><h2>Chemical Calculation</h2></td>
+                    <td><button type="submit" class="pure-button pure-button-primary">Save</button></td>
+                </tr>
+            </table>
+            <label>Name :</label>
+            <input type="text" id="Name" value="@Model.Name" name="Name" />
+            <label>Description :</label>
+            <textarea id="Description" name="Description" cols="40" rows="10">@Model.Description</textarea>
+            <label>Type of calculation :</label>
+            <select asp-for="CalculationType" asp-items="Html.GetEnumSelectList<CalculationType>()"></select>
+            <label>Basisset :</label>
+            <select asp-for="SelectedBasisSet" asp-items="Model.BasisSets"></select>
+            <label>CalculationStatus :</label>
+            <select asp-for="ExecutionStatus" asp-items="Html.GetEnumSelectList<ExecutionStatus>()"></select>
+            <label>Gamess input :</label>
+            <textarea id="GamessInput" name="GamessInput" cols="100" rows="15">@Model.GamessInput</textarea>
+
+            <input type="hidden" value="@Model.Id" id="Id" name="Id" />
+            <input type="hidden" value="@Model.ModelId" id="ModelId" name="ModelId" />
+
+        </form>
+    </div>
+    <div class="pure-u-1-3">
+    </div>
+</div>
+

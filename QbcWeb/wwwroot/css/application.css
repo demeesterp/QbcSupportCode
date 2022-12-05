@@ -1,0 +1,114 @@
+﻿
+/* used for text in the left column   */
+.leftbox {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+.box {
+    margin:20px;
+}
+
+a.Invisible {
+    visibility:hidden;
+}
+
+a.Visible {
+    visibility:visible;
+}
+
+
+/* Header related styles */
+
+header.titlecenterbox {
+    width: 50%;
+    margin: 0 auto;
+}
+
+div.titlecontainer {
+    position: relative;
+    top: 50px;
+}
+
+    div.titlecontainer > h1 {
+        font-size: xx-large;
+        color: olive;
+    }
+
+    div.titlecontainer > h2 {
+        font-size: xx-large;
+        color: #800000;
+    }
+
+/* Footer related styles */
+footer.refcenterbox {
+    width: 70%;
+    margin: 0 auto;
+}
+
+/* Section with the main elements */
+
+section.centerbox {
+    margin-top: 100px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 80%;
+}
+
+h1.std {
+    font-size: x-large;
+    color: olive;
+}
+
+h2.std {
+    font-size: large;
+    color: #800000;
+}
+
+.contentbox {
+    border-width: thin;
+    width: 50%;
+}
+
+.item {
+    margin: 10px;
+}
+
+/* Styles for general use */
+
+.floatleft {
+    float: left;
+}
+
+img.intext {
+    float: right;
+}
+
+.clear {
+    clear: both;
+}
+
+.equation {
+    margin: 20px;
+}
+
+.SubScript {
+    vertical-align: sub;
+    font-size: small;
+}
+
+strong.red {
+    color: red;
+}
+
+strong.blue {
+    color: blue;
+}
+
+.line {
+    margin-top: 50px;
+}
+
+.testbox {
+    background-color: aqua;
+}

@@ -1,0 +1,326 @@
+﻿@page "/moleculeexplorer/{currentmoleculeid}"
+@inject IMoleculeService MoleculesService
+@inject IChemicalModelService ModelService
+@inject NavigationManager NavigationManager
+<hr />
+<div class="container">
+    <section class="row">
+        <div class="col">
+            <div class="d-flex flex-row align-items-center">
+                <h3>View Molecule Data</h3>
+                <a href="moleculemodelcalculations/@CurrentModelId" class="badge badge-light ml-1">Go to Model List</a>
+            </div>
+        </div>
+        <div class="col">
+            <div class="d-flex flex-row align-items-center">
+                <p>@_moleculeModel.Description</p>
+                <p>@_moleculeModel.Comment</p>
+            </div>
+        </div>
+    </section>
+    <hr />
+    <section class="row">
+        <div class="col">
+            <h5>Molecule Properties</h5>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Charge</th>
+                        <th scope="col">Multiplicity</th>
+                        <th scope="col">DftEnergy</th>
+                        <th scope="col">HfEnergy</th>
+                        <th scope="col">NAlphaOrbitals</th>
+                        <th scope="col">NBetaOrbitals</th>
+                        <th scope="col">ElectronAffinity</th>
+                        <th scope="col">Hardness</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>@_moleculeModel.Charge</td>
+                        <td>@_moleculeModel.Multiplicity</td>
+                        <td>@_moleculeModel.DftEnergy</td>
+                        <td>@_moleculeModel.HfEnergy</td>
+                        <td>@_moleculeModel.NAlphaOrbitals</td>
+                        <td>@_moleculeModel.NBetaOrbitals</td>
+                        <td>@_moleculeModel.ElectronAffinity</td>
+                        <td>@_moleculeModel.Hardness</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <section class="row">
+        <div class="col">
+            <h5>Atom Properties</h5>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Position</th>
+                        <th scope="col">Number</th>
+                        <th scope="col">Symbol</th>
+                        <th scope="col">MChrg</th>
+                        <th scope="col">MAcc</th>
+                        <th scope="col">Mbs</th>
+                        <th scope="col">LwChrg</th>
+                        <th scope="col">LwAcc</th>
+                        <th scope="col">LwBs</th>
+                        <th scope="col">CHelpG</th>
+                        <th scope="col">GeoDsc</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var atom in _moleculeModel.Atoms)
+                    {
+                        <tr>
+                            <td>@atom.Position</td>
+                            <td>@atom.Number</td>
+                            <td>@atom.Symbol</td>
+                            <td>@atom.MullikenCharge</td>
+                            <td>@atom.MullikenPopulationAcid</td>
+                            <td>@atom.MullikenPopulationBase</td>
+                            <td>@atom.LowdinCharge</td>
+                            <td>@atom.LowdinPopulationAcid</td>
+                            <td>@atom.LowdinPopulationBase</td>
+                            <td>@atom.CHelpGCharge</td>
+                            <td>@atom.GeoDiscCharge</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <section class="row">
+        <div class="col">
+            <h5>Bond Properties</h5>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Label</th>
+                        <th scope="col">Dist</th>
+                        <th scope="col">BOrd</th>
+                        <th scope="col">BOrdAc</th>
+                        <th scope="col">BOrdBs</th>
+                        <th scope="col">Overlp</th>
+                        <th scope="col">OverlpAc</th>
+                        <th scope="col">OverlapBs</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var bond in _moleculeModel.Bonds)
+                    {
+                        <tr>
+                            <td>@bond.BondLabel</td>
+                            <td>@bond.Distance</td>
+                            <td>@bond.BondOrder</td>
+                            <td>@bond.BondOrderAcid</td>
+                            <td>@bond.BondOrderBase</td>
+                            <td>@bond.OverlapPopulation</td>
+                            <td>@bond.OverlapPopulationAcid</td>
+                            <td>@bond.OverlapPopulationBase</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <section class="row">
+        <div class="col">
+            <h5>Atom Orbital Properties</h5>
+            @foreach (var atom in _moleculeModel.Atoms)
+            {
+                <ul>
+                    <li>
+                        <p>@atom.Symbol&nbsp;@atom.Position</p>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Label</th>
+                                    <th scope="col">Ml</th>
+                                    <th scope="col">MlAc</th>
+                                    <th scope="col">MlBs</th>
+                                    <th scope="col">Lwl</th>
+                                    <th scope="col">LwAc</th>
+                                    <th scope="col">LwBs</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var atomOrbital in atom.AtomOrbitals)
+                                {
+                                    <tr>
+                                        <td>@atomOrbital.Symbol&nbsp;@atomOrbital.Position</td>
+                                        <td>@atomOrbital.MullikenPopulation</td>
+                                        <td>@atomOrbital.MullikenPopulationAcid</td>
+                                        <td>@atomOrbital.MullikenPopulationBase</td>
+                                        <td>@atomOrbital.LowdinPopulation</td>
+                                        <td>@atomOrbital.LowdinPopulationAcid</td>
+                                        <td>@atomOrbital.LowdinPopulationBase</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </li>
+                </ul>
+            }
+        </div>
+    </section>
+    <section class="row">
+        <div class="col">
+            <EditForm Model="@_moleculeModel" OnSubmit="@OnHandleSubmitUpdateMoleculeAsync">
+                <div class="form-group">
+                    <label for="modelname">Name:</label>
+                    <InputText class="form-control" id="modelname" @bind-Value="_moleculeModel.Name" />
+                </div>
+                <div class="form-group">
+                    <label for="modeldescription">Description:</label>
+                    <InputTextArea rows="5" class="form-control" id="modeldescription" @bind-Value="_moleculeModel.Description"></InputTextArea>
+                </div>
+                <div class="form-group">
+                    <label for="modelcomment">Comment:</label>
+                    <InputTextArea rows="5" class="form-control" id="modelcomment" @bind-Value="_moleculeModel.Comment"></InputTextArea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </EditForm>
+        </div>
+        <div class="col">
+            <p>Molecule Geometry</p>
+            <textarea rows="20" cols="40">
+                @_moleculeModel.Geometry
+            </textarea>
+        </div>
+    </section>
+</div>
+
+@code {
+
+    [Parameter]
+    public string CurrentMoleculeId { get; set; }
+
+    public string CurrentModelId { get; set; }
+
+    public MoleculeInputModel _moleculeModel { get; set; } = new MoleculeInputModel();
+
+    public MoleculeInfo _molecule { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (int.TryParse(this.CurrentMoleculeId, out int molid))
+        {
+            this._molecule = await this.MoleculesService.GetById(molid);
+            this.CurrentModelId = _molecule.ModelId.ToString();
+            _moleculeModel = await ConvertAsync(_molecule);
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitAsync();
+    }
+
+    #region private helpers
+
+    private async Task InitAsync()
+    {
+        await Task.CompletedTask;
+    }
+
+    private async Task<MoleculeInputModel> ConvertAsync(MoleculeInfo input)
+    {
+        MoleculeInputModel model = new MoleculeInputModel();
+
+        model.Name = input.NameInfo;
+        model.Description = input.Description;
+        model.Comment = input.Comment;
+        model.Id = input.Id;
+        model.ModelId = input.ModelId;
+
+        var modelResult = await this.ModelService.Get(input.ModelId);
+
+        model.ModelName = modelResult.Name;
+
+        model.Hardness = input.Hardness;
+        model.HfEnergy = input.HFEnergy;
+        model.Multiplicity = input.Multiplicity;
+        model.NAlphaOrbitals = input.NAlphaOrbitals;
+        model.NBetaOrbitals = input.NBetaOrbitals;
+        model.ElectronAffinity = input.ElectronAffinity;
+        model.DftEnergy = input.DftEnergy;
+
+        StringBuilder currentGeometry = new StringBuilder();
+        currentGeometry.AppendLine(input.Atoms.Count.ToString());
+        currentGeometry.AppendLine(" ");
+        foreach (var atom in (from i in input.Atoms orderby i.Number ascending select i))
+        {
+            currentGeometry.AppendLine($"{atom.Symbol} {atom.PosX:0.00000} {atom.PosY:0.00000} {atom.PosZ:0.00000}".Replace(",", "."));
+        }
+
+        model.Geometry = currentGeometry.ToString();
+
+        model.Atoms.AddRange(input.Atoms.ConvertAll(i => new MoleculeAtomInputModel()
+        {
+            AtomicWeight = i.AtomicWeight,
+            CHelpGCharge = i.CHelpGCharge,
+            GeoDiscCharge = i.GeoDiscCharge,
+            LowdinCharge = i.AtomicWeight - i.LowdinPopulation,
+            LowdinPopulationAcid = i.LowdinPopulationAcid,
+            LowdinPopulationBase = i.LowdinPopulationBase,
+            MullikenCharge = i.AtomicWeight - i.MullikenPopulation,
+            MullikenPopulationAcid = i.MullikenPopulationAcid,
+            MullikenPopulationBase = i.MullikenPopulationBase,
+            Number = i.Number,
+            Position = i.Position,
+            Symbol = i.Symbol,
+            AtomOrbitals = (from o in i.Orbitals
+                            orderby o.Position ascending
+                            select new MoleculeAtomOrbitalInputModel()
+                            {
+                                Symbol = o.Symbol,
+                                LowdinPopulation = o.LowdinPopulation,
+                                LowdinPopulationAcid = o.LowdinPopulationAcid,
+                                LowdinPopulationBase = o.LowdinPopulationBase,
+                                MullikenPopulation = o.MullikenPopulation,
+                                MullikenPopulationAcid = o.MullikenPopulationAcid,
+                                MullikenPopulationBase = o.MullikenPopulationBase,
+                                Position = o.Position
+                            }).ToList()
+        }));
+
+
+        foreach (var bond in input.Bonds)
+        {
+            if (bond.OverlapPopulation > 0.1m || bond.OverlapPopulationAcid > 0.1m || bond.OverlapPopulationBase > 0.1m)
+            {
+                var atom1 = input.Atoms.Find(i => i.Position == bond.Atom1Position);
+                var atom2 = input.Atoms.Find(i => i.Position == bond.Atom2Position);
+                model.Bonds.Add(new MoleculeBondInputModel()
+                {
+                    BondLabel = atom1.Symbol + atom1.Position.ToString() + "-" + atom2.Symbol + atom2.Position.ToString(),
+                    BondOrder = bond.BondOrder,
+                    BondOrderAcid = bond.BondOrderAcid,
+                    BondOrderBase = bond.BondOrderBase,
+                    Distance = bond.Distance,
+                    OverlapPopulation = bond.OverlapPopulation,
+                    OverlapPopulationAcid = bond.OverlapPopulationAcid,
+                    OverlapPopulationBase = bond.OverlapPopulationBase
+                });
+            }
+        }
+
+        return model;
+    }
+
+    private async Task OnHandleSubmitUpdateMoleculeAsync()
+    {
+        if (int.TryParse(this.CurrentMoleculeId, out int molid))
+        {
+            _molecule.NameInfo = _moleculeModel.Name;
+            _molecule.Description = _moleculeModel.Description;
+            _molecule.Comment = _moleculeModel.Comment;
+            await this.MoleculesService.UpdateAsync(_molecule.Id, _molecule);
+        }
+    }
+
+    #endregion
+
+
+}

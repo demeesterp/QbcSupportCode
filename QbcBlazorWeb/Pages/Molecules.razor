@@ -1,0 +1,86 @@
+﻿@page "/molecules"
+@inject IChemicalProjectService ProjectService
+@inject NavigationManager NavigationManager
+<hr class="line" />
+<div class="container">
+    <section class="row">
+        <div class="col">
+            <h1>Project</h1>
+            <div class="list-group">
+                @foreach (var project in this.ProjectList)
+                {
+                    <a href="moleculemodels/@project.Id" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">@project.Name</h5>
+                        </div>
+                        <p class="mb-1">@project.Description</p>
+                    </a>
+                }
+            </div>
+        </div>
+        <div class="col">
+            <h1>Create new Project</h1>
+            <EditForm Model="@_projectModel" OnSubmit="@OnHandleSubmit">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <InputText class="form-control" id="name" @bind-Value="_projectModel.Name" />
+                </div>
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <InputTextArea rows="5" class="form-control" id="description" @bind-Value="_projectModel.Description"></InputTextArea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </EditForm>
+        </div>
+    </section>
+</div>
+@code {
+
+    #region private properties
+
+
+    private ChemicalProjectInputModel _projectModel { get; set; }
+
+
+    private List<ChemicalProject> ProjectList { get; set; }
+
+
+    #endregion
+
+    protected override async Task OnInitializedAsync()
+    {
+        Init();
+        var result = await this.ProjectService.GetAllChemicalProjectAsync();
+        if (result.Any())
+        {
+            this.ProjectList.AddRange(result);
+            this.ProjectList.Sort((i, j) => i.Name.CompareTo(j.Name));
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Task.CompletedTask;
+
+    }
+
+    private async Task OnHandleSubmit()
+    {
+        var result = await this.ProjectService.CreateAsync(new ChemicalProject()
+        {
+            Description = _projectModel.Description,
+            Name = _projectModel.Name
+        });
+        this.ProjectList.Add(result);
+        this.ProjectList.Sort((i, j) => i.Name.CompareTo(j.Name));
+        this._projectModel = new ChemicalProjectInputModel();
+    }
+
+    private void Init()
+    {
+        this._projectModel = new ChemicalProjectInputModel();
+        this.ProjectList = new List<ChemicalProject>();
+
+    }
+
+}

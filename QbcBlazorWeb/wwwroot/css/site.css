@@ -1,0 +1,32 @@
+h1.std {
+    color: olive;
+}
+
+h2.std {
+    color: #800000;
+}
+
+/* Styles for general use */
+
+img.intext {
+    float: right;
+}
+
+.equation {
+    margin: 20px;
+}
+
+.SubScript {
+    vertical-align: sub;
+    font-size: small;
+}
+
+.line {
+    margin-top: 50px;
+}
+
+@media screen and (max-width:900px) {
+    img.remove {
+        display: none;
+    }
+}

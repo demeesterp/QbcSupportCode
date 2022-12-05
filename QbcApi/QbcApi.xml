@@ -1,0 +1,410 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>QbcApi</name>
+    </assembly>
+    <members>
+        <member name="M:QbcApi.Controllers.BotanicalNameInfoController.#ctor(QbcBackend.Molecules.Services.IBotanicalNameService)">
+            <summary>
+            BotanicalNameInfoController
+            </summary>
+            <param name="svc">service to delegate all calls</param>
+        </member>
+        <member name="M:QbcApi.Controllers.BotanicalNameInfoController.Get">
+            <summary>
+            Get all botanical names
+            </summary>
+            <returns>List of botanical names</returns>
+            <response code="200">the operation succeeded</response>
+            <response code="204">no data found</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.BotanicalNameInfoController.Get(System.String)">
+            <summary>
+            Get the nameinfo by name
+            </summary>
+            <param name="name">the case insensitive name of the botanical name</param>
+            <returns>the requested botanical name</returns>
+            <response code="200">the operation succeeded</response>
+            <response code="204">no data found</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.BotanicalNameInfoController.GetPedigreeByName(System.String)">
+            <summary>
+            Get the pedigree for the specified name
+            </summary>
+            <param name="name">the case insensitive name of the botanical name</param>
+            <returns>list with botanical names from parent to child</returns>
+            <response code="200">the operation succeeded</response>
+            <response code="204">no data found</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.BotanicalNameInfoController.Post(QbcBackend.Molecules.Model.Botany.BotanicalNameInfo)">
+            <summary>
+            Insert a new botanical name
+            </summary>
+            <param name="value">the data to insert</param>
+            <returns>Information about the success or failure</returns>
+            <response code="201">the insert worked</response>
+            <response code="500">internal server error</response>
+            <response code="406">a validation error occured</response>
+        </member>
+        <member name="M:QbcApi.Controllers.BotanicalNameInfoController.Put(System.String,QbcBackend.Molecules.Model.Botany.BotanicalNameInfo)">
+            <summary>
+            Update a botanical name
+            </summary>
+            <param name="name">the case insensitive name of the botanical name</param>
+            <param name="value">the data to update</param>
+            <returns>Information about the success or failure</returns>
+            <response code="202">the update was acepted</response>
+            <response code="406">a validation error occured</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.BotanicalNameInfoController.Delete(System.String)">
+            <summary>
+            Delete a botanical name
+            </summary>
+            <param name="name">the case insensitive name of the botanical name</param>
+            <returns>Information about the success or failure</returns>
+            <response code="202">the delete worked</response>
+            <response code="406">a validation error occured</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.BotanicalRankController.#ctor(QbcBackend.Molecules.Services.IBotanicalRankService)">
+            <summary>
+            BotanicalRankController
+            </summary>
+            <param name="service">input service</param>
+        </member>
+        <member name="M:QbcApi.Controllers.BotanicalRankController.Get">
+            <summary>
+            Get all botanical ranks
+            </summary>
+            <returns>The list of all botanicals ranks from parent to child </returns>
+            <response code="200">the operation succeeded</response>
+            <response code="204">no data found</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.BotanicalRankController.Get(System.String)">
+            <summary>
+            Get the botanical rank bij name
+            </summary>
+            <param name="name">the case sensitive name of the botanical rank</param>
+            <returns>The requested botanical rank</returns>
+            <response code="200">the operation succeeded</response>
+            <response code="204">no data found</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.BotanicalRankController.GetPedigreeByName(System.String)">
+            <summary>
+            Get the pedigree of the botanical rank
+            </summary>
+            <param name="name">the case sensitive name of the botanical rank</param>
+            <returns>The list of botanical rank in the order parent to child</returns>
+            <response code="200">the operation succeeded</response>
+            <response code="204">no data found</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.BotanicalRankController.Post(QbcBackend.Molecules.Model.Botany.BotanicalRank)">
+            <summary>
+            Insert a botanical rank
+            </summary>
+            <param name="value">the data to insert</param>
+            <returns>Information about the success or failure</returns>
+            <response code="201">the insert worked</response>
+            <response code="500">internal server error</response>
+            <response code="406">a validation error occured</response>
+        </member>
+        <member name="M:QbcApi.Controllers.BotanicalRankController.Put(System.String,QbcBackend.Molecules.Model.Botany.BotanicalRank)">
+            <summary>
+            Update a botanical rank
+            </summary>
+            <param name="name">the case sensitive name of the botanical rank</param>
+            <param name="value">the data to update</param>
+            <returns>Information about the success or failure</returns>
+            <response code="202">the update was acepted</response>
+            <response code="406">a validation error occured</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.BotanicalRankController.Delete(System.String)">
+            <summary>
+            Delete a botanical rank
+            </summary>
+            <param name="name">the case sensitive name of the botanical rank</param>
+            <returns>Information about the success or failure</returns>
+            <response code="202">the delete worked</response>
+            <response code="406">a validation error occured</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalCalculationController.Get(System.Int32)">
+            <summary>
+            Get a specified chemical calculation
+            </summary>
+            <param name="Id">the Id of the calculation</param>
+            <returns>Information about a chelical calculation</returns>
+            <response code="200">the operation succeeded</response>
+            <response code="204">no data found</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalCalculationController.GetByModel(System.Int32)">
+            <summary>
+            Get the list of calculations for the model
+            </summary>
+            <param name="modelId">the id of the model</param>
+            <returns>List of calculation corresponding to the model</returns>
+            <response code="200">the operation succeeded</response>
+            <response code="204">no data found</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalCalculationController.Post(QbcBackend.Molecules.Model.MoleculeCalculation.ChemicalCalculation)">
+            <summary>
+            Create a chemical calculation
+            </summary>
+            <param name="value">the chemical calculation to create</param>
+            <returns>Infirmation about success or failure</returns>
+            <response code="201">the insert worked</response>
+            <response code="500">internal server error</response>
+            <response code="406">a validation error occured</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalCalculationController.Put(System.Int32,QbcBackend.Molecules.Model.MoleculeCalculation.ChemicalCalculation)">
+            <summary>
+            Update a chemical calculation
+            </summary>
+            <param name="id">the id of the calculation to update</param>
+            <param name="value">the data to update</param>
+            <returns>Information about the success or failure</returns>
+            <response code="202">the update was acsepted</response>
+            <response code="406">a validation error occured</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalCalculationController.Delete(System.Int32)">
+            <summary>
+            Delete a chemical calculation
+            </summary>
+            <param name="id">the id of the calculation to delete</param>
+            <returns>Information about the success or failure</returns>
+            <response code="202">the delete worked</response>
+            <response code="406">a validation error occured</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalCalculationGroupController.GetByParent(System.Int32)">
+            <summary>
+            Get the chemical models for the project
+            </summary>
+            <param name="parentId"></param>
+            <returns>the corresponding chemical calculationgroups </returns>
+            <response code="200">the operation succeeded</response>
+            <response code="204">no data found</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalCalculationGroupController.Post(QbcBackend.Molecules.Model.MoleculeCalculation.ChemicalCalculationGroup)">
+            <summary>
+            Create a new calculationgroup
+            </summary>
+            <param name="value">the data to insert</param>
+            <returns>Information about the success or failure</returns>
+            <response code="201">the insert worked</response>
+            <response code="500">internal server error</response>
+            <response code="406">a validation error occured</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalCalculationGroupController.Put(System.Int32,QbcBackend.Molecules.Model.MoleculeCalculation.ChemicalCalculationGroup)">
+            <summary>
+            Update a calculationgroup
+            </summary>
+            <param name="id">the id of the calculationgroup to update</param>
+            <param name="value">the data to update</param>
+            <returns>Information about the success or failure</returns>
+            <response code="202">the update was acepted</response>
+            <response code="406">a validation error occured</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalCalculationGroupController.Delete(System.Int32)">
+            <summary>
+            Delete a calculationgroup
+            </summary>
+            <param name="id">the id of the calculationgroup to delete</param>
+            <returns>Information about the success or failure</returns>
+            <response code="202">the delete worked</response>
+            <response code="406">a validation error occured</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalModelController.Get(System.Int32)">
+            <summary>
+            Get the chemical model for the id
+            </summary>
+            <returns>the corresponding chemical model </returns>
+            <response code="200">the operation succeeded</response>
+            <response code="204">no data found</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalModelController.GetByProject(System.Int32)">
+            <summary>
+            Get the chemical models for the project
+            </summary>
+            <param name="projectId"></param>
+            <returns>the corresponding chemical models </returns>
+            <response code="200">the operation succeeded</response>
+            <response code="204">no data found</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalModelController.Post(QbcBackend.Molecules.Model.MoleculeModel.ChemicalModel)">
+            <summary>
+            Create a new chemical model
+            </summary>
+            <param name="value">the data to insert</param>
+            <returns>Information about the success or failure</returns>
+            <response code="201">the insert worked</response>
+            <response code="500">internal server error</response>
+            <response code="406">a validation error occured</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalModelController.Put(System.Int32,QbcBackend.Molecules.Model.MoleculeModel.ChemicalModel)">
+            <summary>
+            Update a chemical model
+            </summary>
+            <param name="id">the id of the model to update</param>
+            <param name="value">the data to update</param>
+            <returns>Information about the success or failure</returns>
+            <response code="202">the update was acepted</response>
+            <response code="406">a validation error occured</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalModelController.Delete(System.Int32)">
+            <summary>
+            Delete a chemical model
+            </summary>
+            <param name="id">the id of the model to delete</param>
+            <returns>Information about the success or failure</returns>
+            <response code="202">the delete worked</response>
+            <response code="406">a validation error occured</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="T:QbcApi.Controllers.ChemicalProjectController">
+            <summary>
+            CategoriesController
+            </summary>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalProjectController.Get">
+            <summary>
+            Get all projects
+            </summary>
+            <returns>The list of prjects </returns>
+            <response code="200">the operation succeeded</response>
+            <response code="204">no data found</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalProjectController.GetByName(System.String)">
+            <summary>
+            Get the list of project matching the name
+            </summary>
+            <param name="name">The name or a pattern mathcing the name</param>
+            <returns>The list of prjects </returns>
+            <response code="200">the operation succeeded</response>
+            <response code="204">no data found</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalProjectController.Get(System.Int32)">
+            <summary>
+            Get the project with all related data
+            </summary>
+            <param name="id">The id of the project</param>
+            <returns>The project with all related data</returns>
+            <response code="200">the operation succeeded</response>
+            <response code="204">no data found</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalProjectController.Post(QbcBackend.Molecules.Model.MoleculeProject.ChemicalProject)">
+            <summary>
+            Create a new chemical project
+            </summary>
+            <param name="value">the data to insert</param>
+            <returns>Information about the success or failure</returns>
+            <response code="201">the insert worked</response>
+            <response code="500">internal server error</response>
+            <response code="406">a validation error occured</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalProjectController.Put(System.Int32,QbcBackend.Molecules.Model.MoleculeProject.ChemicalProject)">
+            <summary>
+            Update a chemical project
+            </summary>
+            <param name="id">the id of the project to update</param>
+            <param name="value">the data to update</param>
+            <returns>Information about the success or failure</returns>
+            <response code="202">the update was acepted</response>
+            <response code="406">a validation error occured</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.ChemicalProjectController.Delete(System.Int32)">
+            <summary>
+            Delete a chemical project
+            </summary>
+            <param name="id">the id of the project to delete</param>
+            <returns>Information about the success or failure</returns>
+            <response code="202">the delete worked</response>
+            <response code="406">a validation error occured</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.MoleculeController.GetByModel(System.Int32)">
+            <summary>
+            Get the list of molecules corresponding to the model
+            </summary>
+            <param name="modelId">the id of the model</param>
+            <returns>List of molecules</returns>
+            <response code="200">the operation succeeded</response>
+            <response code="204">no data found</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.MoleculeController.GetByCalculation(System.Int32)">
+            <summary>
+            Get the list of molecules corresponding to the calculation
+            </summary>
+            <param name="calculationid">the id of the calculation</param>
+            <returns>List of molecules</returns>
+            <response code="200">the operation succeeded</response>
+            <response code="204">no data found</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.MoleculeController.GetById(System.Int32)">
+            <summary>
+            Get the molcule with his unique identifier
+            </summary>
+            <param name="id">id if the molecule</param>
+            <returns>molecule</returns>
+        </member>
+        <member name="M:QbcApi.Controllers.MoleculeController.Post(QbcBackend.Molecules.Model.Molecule.MoleculeInfo)">
+            <summary>
+            Create a molecule
+            </summary>
+            <param name="value">the moleculeto create</param>
+            <returns>Infirmation about success or failure</returns>
+            <response code="201">the insert worked</response>
+            <response code="500">internal server error</response>
+            <response code="406">a validation error occured</response>
+        </member>
+        <member name="M:QbcApi.Controllers.MoleculeController.Put(System.Int32,QbcBackend.Molecules.Model.Molecule.MoleculeInfo)">
+            <summary>
+            Update a molecule
+            </summary>
+            <param name="id">the id of the molecule to update</param>
+            <param name="value">the data to update</param>
+            <returns>Information about the success or failure</returns>
+            <response code="202">the update was acsepted</response>
+            <response code="406">a validation error occured</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="M:QbcApi.Controllers.MoleculeController.Delete(System.Int32)">
+            <summary>
+            Delete a molecule
+            </summary>
+            <param name="id">the id of the molecule to delete</param>
+            <returns>Information about the success or failure</returns>
+            <response code="202">the delete worked</response>
+            <response code="406">a validation error occured</response>
+            <response code="500">internal server error</response>
+        </member>
+        <member name="P:QbcApi.Startup.Configuration">
+            <summary>
+            Configuration
+            </summary>
+        </member>
+    </members>
+</doc>

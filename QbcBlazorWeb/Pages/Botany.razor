@@ -1,0 +1,268 @@
+﻿@page "/plants"
+@page "/plants/{current}"
+@inject IBotanicalNameService BotanicalNameService
+@inject IBotanicalRankService BotanicalRankService
+@inject NavigationManager NavigationManager
+<hr class="line" />
+<div class="container">
+    <section class="row mt-2">
+        <div class="col-2">
+            <h4 class="text-center"> Children </h4>
+            <div class="list-group mt-1">
+                @foreach (var child in this.Children)
+                {
+                    <a href="plants/@child.Name" class="list-group-item list-group-item-action">
+                        @child.Name
+                    </a>
+                }
+            </div>
+        </div>
+        <div class="col-8">
+            <div class="card">
+                <div class="card-header">
+                    <div><h1 class="std mr-3">@RootNameInfo?.Name</h1></div>
+                    <div class="d-flex flex-row">
+                        <div class="btn-toolbar mb-3" role="toolbar" aria-label="Toolbar with button groups">
+                            <div class="btn-group" role="group">
+                                <button type="button" @onclick="OnSearch" class="btn btn-secondary">Search</button>
+                            </div>
+                            <div class="input-group mr-1">
+                                <input type="text"
+                                       @bind="_search"
+                                       class="form-control"
+                                       placeholder="search for botanical name"
+                                       aria-label="search for botanical name">
+                            </div>
+                            <div class="btn-group" role="group">
+                                <button type="button" @onclick="OnEdit" class="btn btn-secondary mr-1">Edit</button>
+                                <button type="button" @onclick="OnAdd" class="btn btn-secondary mr-1">Add</button>
+                                <button type="button" @onclick="OnDelete" class="btn btn-secondary mr-1"  @attributes="CanDelete" >Delete</button>
+                                <button type="button" class="btn btn-secondary mr-1">Molecules</button>
+                                <button type="button" class="btn btn-secondary  mr-1">Pictures</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <h4 class="card-title">Rank : @RootNameInfo?.Rank</h4>
+                            <p class="card-text">@RootNameInfo?.Description</p>
+                        </div>
+                        <div class="col">
+                            <EditForm Model="@_nameModel" OnSubmit="@OnHandleSubmit">
+                                <div class="form-group">
+                                    <label for="name">Name:</label>
+                                    <InputText class="form-control" id="name" @bind-Value="_nameModel.Name" />
+                                </div>
+                                <div class="form-group">
+                                    <label for="description">Description:</label>
+                                    <InputTextArea rows="10" class="form-control" id="description" @bind-Value="_nameModel.Description"></InputTextArea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="description">Rank:</label>
+                                    <InputSelect class="form-control" @bind-Value="_nameModel.Rank">
+                                        <option value="">Select classification ...</option>
+                                        @foreach (var rankItem in this.Ranks)
+                                        {
+                                            <option value="@rankItem.Name">@rankItem.Name</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </EditForm>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-2">
+            <h4 class="text-center"> Ancestors </h4>
+            <div class="list-group mt-1">
+                @foreach (var child in this.Ancestors)
+                {
+                    <a href="plants/@child.Name" class="list-group-item list-group-item-action">
+                        @child.Name
+                    </a>
+                }
+            </div>
+        </div>
+    </section>
+</div>
+
+@code {
+
+    #region private fields
+
+    private string _search { get; set; }
+
+    private BotanicalNameInputModel _nameModel { get; set; }
+
+    #endregion
+
+
+    [Parameter]
+    public string Current
+    {
+        get;
+        set;
+    }
+
+    [Parameter]
+    public BotanicalNameInfo RootNameInfo
+    {
+        get;
+        set;
+    }
+
+    public List<BotanicalNameInfo> Children
+    {
+        get;
+        set;
+    }
+
+    public List<BotanicalNameInfo> Ancestors
+    {
+        get;
+        set;
+    }
+
+    public List<BotanicalRank> Ranks
+    {
+        get;
+        set;
+    }
+
+    private Dictionary<string, object> CanDelete
+    {
+        get
+        {
+
+            string retval = string.Empty;
+
+            if (this.Children?.Any() == true)
+            {
+                retval = "disabled";
+            }
+
+            return !String.IsNullOrWhiteSpace(retval) ? new Dictionary<string, object>() { { retval , retval } } : new Dictionary<string, object>();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Init();
+
+
+        await Task.CompletedTask;
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Init();
+        if (String.IsNullOrWhiteSpace(Current))
+        {
+            Current = "viridiplantaea";
+        }
+        RootNameInfo = await this.BotanicalNameService.GetByNameAsync(Current);
+        Children?.AddRange(RootNameInfo.Children);
+        Ancestors?.AddRange(await this.BotanicalNameService.GetPedigreeByNameAsync(Current));
+        Ranks?.AddRange(await this.BotanicalRankService.GetAllAsync());
+    }
+
+    private async Task OnSearch()
+    {
+        if (!String.IsNullOrWhiteSpace(this._search))
+        {
+            var result = await this.BotanicalNameService.GetByNameAsync(_search);
+            if (result != null)
+            {
+                NavigationManager.NavigateTo($"plants/{result.Name}");
+            }
+        }
+    }
+
+
+    private void OnEdit()
+    {
+        SetNameInfoForm(this.RootNameInfo);
+    }
+
+    private void OnAdd()
+    {
+        ClearNameInfoForm();
+    }
+
+    private async Task OnDelete()
+    {
+        if ( this.RootNameInfo.Children.Any() == false )
+        {
+            string parent = this.RootNameInfo.ParentName;
+            await this.BotanicalNameService.DeleteAsync(this.RootNameInfo.Name);
+            NavigationManager.NavigateTo($"plants/{parent}");
+        }
+    }
+
+
+    private async Task OnHandleSubmit()
+    {
+        if ( this._nameModel.Id == this.RootNameInfo.Id )
+        {
+            var result = await this.BotanicalNameService.UpdateAsync(new BotanicalNameInfo
+            {
+                Id = this._nameModel.Id,
+                Name = this._nameModel.Name,
+                Description = this._nameModel.Description,
+                ParentName = this.RootNameInfo.ParentName,
+                Rank =  this._nameModel.Rank
+
+            });
+            this.ClearNameInfoForm();
+            this.RootNameInfo = result;
+        }
+        else
+        {
+            var result = await this.BotanicalNameService.CreateAsync(new BotanicalNameInfo()
+            {
+                Id = this._nameModel.Id,
+                Name = this._nameModel.Name,
+                Description = this._nameModel.Description,
+                Rank =  this._nameModel.Rank,
+                ParentName = this.RootNameInfo.Name
+            });
+
+            if ( result != null)
+            {
+                NavigationManager.NavigateTo($"plants/{result.Name}");
+            }
+        }
+    }
+
+
+    private void Init()
+    {
+        this.Children = new List<BotanicalNameInfo>();
+        this.Ancestors = new List<BotanicalNameInfo>();
+        this.Ranks = new List<BotanicalRank>();
+        this._search = string.Empty;
+        this._nameModel = new BotanicalNameInputModel();
+    }
+
+    private void ClearNameInfoForm()
+    {
+        this._nameModel.Id = 0;
+        this._nameModel.Name = string.Empty;
+        this._nameModel.Description = string.Empty;
+        this._nameModel.Rank = string.Empty;
+    }
+
+    private void SetNameInfoForm(BotanicalNameInfo nameInfo)
+    {
+        this._nameModel.Id = nameInfo.Id;
+        this._nameModel.Name = nameInfo.Name;
+        this._nameModel.Description = nameInfo.Description;
+        this._nameModel.Rank = nameInfo.Rank;
+    }
+
+}

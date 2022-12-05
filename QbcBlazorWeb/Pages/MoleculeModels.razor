@@ -1,0 +1,161 @@
+﻿@page "/moleculemodels/{currentprojectid}"
+@inject IChemicalProjectService ProjectService
+@inject IChemicalModelService modelService
+@inject NavigationManager NavigationManager
+<hr class="line" />
+<div class="container">
+    <section class="row">
+        <div class="col">
+            <div class="d-flex flex-row align-items-center">
+                <h3>Update Project</h3>
+                <a href="molecules" class="badge badge-light ml-1" >Go to Project List</a>
+            </div>
+
+            <EditForm Model="@_projectModel" OnSubmit="@OnHandleSubmitUpdateProjectAsync">
+                <div class="form-group">
+                    <label for="name">Name:</label>
+                    <InputText class="form-control" id="name" @bind-Value="_projectModel.Name" />
+                </div>
+                <div class="form-group">
+                    <label for="description">Description:</label>
+                    <InputTextArea rows="5" class="form-control" id="description" @bind-Value="_projectModel.Description"></InputTextArea>
+                </div>
+                @if (this.ModelList.Count == 0)
+                {
+                    <button type="button" @onclick="@OnDeleteProjectAsync" class="btn btn-primary">Delete</button>
+                }
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </EditForm>
+        </div>
+        <div class="col">
+            <h3>Molecule Model</h3>
+            <div class="list-group">
+                @foreach (var model in this.ModelList)
+                {
+                    <a href="moleculemodelcalculations/@model.Id" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">@model.Name</h5>
+                        </div>
+                        <p class="mb-1">@model.Description</p>
+                    </a>
+                }
+            </div>
+        </div>
+        <div class="col">
+            <h1>Create Model</h1>
+            <EditForm Model="@_moleculeModelModel" OnSubmit="@OnHandleSubmitCreateModelAsync">
+                <div class="form-group">
+                    <label for="modelname">Name:</label>
+                    <InputText class="form-control" id="modelname" @bind-Value="_moleculeModelModel.Name" />
+                </div>
+                <div class="form-group">
+                    <label for="modeldescription">Description:</label>
+                    <InputTextArea rows="5" class="form-control" id="modeldescription" @bind-Value="_moleculeModelModel.Description"></InputTextArea>
+                </div>
+                <div class="form-group">
+                    <label for="charge">Charge:</label>
+                    <InputNumber class="form-control" @bind-Value="_moleculeModelModel.Charge" id="charge"></InputNumber>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </EditForm>
+        </div>
+    </section>
+</div>
+
+
+@code {
+
+    [Parameter]
+    public string CurrentProjectId { get; set; }
+
+    private ChemicalProjectInputModel _projectModel { get; set; }
+
+    private ChemicalModelInputModel _moleculeModelModel { get; set; }
+
+    private List<ModelInfo> ModelList { get; set; }
+
+
+    private async Task OnHandleSubmitUpdateProjectAsync()
+    {
+        if (int.TryParse(this.CurrentProjectId, out int projectid))
+        {
+            await this.ProjectService.UpdateAsync(projectid, new ChemicalProject()
+            {
+                Description = this._projectModel.Description,
+                Name = this._projectModel.Name,
+                Id = this._projectModel.Id
+            });
+        }
+    }
+
+    private async Task OnHandleSubmitCreateModelAsync()
+    {
+        if (int.TryParse(this.CurrentProjectId, out int projectid))
+        {
+            var result = await this.modelService.CreateAsync(new ModelInfo()
+            {
+                Charge = this._moleculeModelModel.Charge,
+                Id = this._moleculeModelModel.Id,
+                CurrentGeometry = this._moleculeModelModel.CurrentGeometry,
+                Description = this._moleculeModelModel.Description,
+                Name = this._moleculeModelModel.Name,
+                InitialGeometry = this._moleculeModelModel.InitialGeometry,
+                ProjectID = projectid
+            });
+            if (result != null)
+            {
+                this.ModelList.Add(result);
+                this.ModelList.Sort((lhs, rhs) => lhs.Name.CompareTo(rhs.Name));
+            }
+        }
+    }
+
+    private async Task OnDeleteProjectAsync()
+    {
+        if (int.TryParse(this.CurrentProjectId, out int projectid))
+        {
+            await this.ProjectService.DeleteAsync(projectid);
+            NavigationManager.NavigateTo($"molecules");
+        }
+    }
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (int.TryParse(this.CurrentProjectId, out int projectid))
+        {
+            var result = await this.ProjectService.GetChemicalProjectAsync(projectid);
+            if (result != null)
+            {
+                this._projectModel.Id = result.Id;
+                this._projectModel.Name = result.Name;
+                this._projectModel.Description = result.Description;
+            }
+
+            var modelList = await this.modelService.GetModelForProject(projectid);
+            if (modelList?.Any() == true)
+            {
+                this.ModelList.AddRange(modelList);
+                this.ModelList.Sort((lhs, rhs) => lhs.Name.CompareTo(rhs.Name));
+            }
+
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Init();
+
+
+        await Task.CompletedTask;
+    }
+
+    private void Init()
+    {
+        this._projectModel = new ChemicalProjectInputModel();
+        this._moleculeModelModel = new ChemicalModelInputModel();
+        this.ModelList = new List<ModelInfo>();
+
+    }
+
+}

@@ -1,0 +1,178 @@
+﻿
+@{
+    ViewData["Title"] = "MoleculesMolecule";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model QbcWeb.Models.MoleculeViewModel;
+
+
+ <script>
+        function CopyToClipboard(id) {
+        var copyText = document.getElementById(id);
+
+        var toreplace = "\n\r\n\r";
+        var replacevalue = "\n\r";
+        /* Select the text field */
+        var text = "" + copyText.value;
+        text = text.replace(toreplace, replacevalue);
+        copyText.value = text;
+
+        copyText.select()
+        document.execCommand("copy")
+    }
+</script>
+
+<div class="pure-g">
+    <div class="pure-u-1-5">
+        <div class="leftbox">
+            <a title="Go to project" asp-controller="MoleculesModel" asp-action="Index" asp-route-id=@Model.ModelId>@Model.ModelName</a>
+            <form asp-controller="MoleculesMolecule" asp-action="UpdateMolecule" method="post" class="pure-form pure-form-stacked">
+                <h2>Update Molecule</h2>
+                <label>Name :</label>
+                <input type="text" id="Name" value="@Model.Name" name="Name" />
+                <label>Description :</label>
+                <textarea id="Description" name="Description" cols="20" rows="10">@Model.Description</textarea>
+                <label>Comment :</label>
+                <textarea id="Comment" name="Comment" cols="20" rows="30">@Model.Comment</textarea>
+                <input type="hidden" value="@Model.Id" id="Id" name="Id" />
+                <button type="submit" class="pure-button pure-button-primary">Update</button>
+            </form>
+        </div>
+    </div>
+        <div class="pure-u-4-5">
+            <table>
+                <tr>
+                    <td>
+                        <button type="button" class="btn" onclick="CopyToClipboard('MoleculeGeometry')" >
+                            Molecular Geometry : Copy to clipboard
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <textarea id="MoleculeGeometry" name="MoleculeGeometry" cols="70" rows="30">@Model.Geometry</textarea>
+                    </td>               
+                </tr>
+            </table>
+            
+        <h2>Molecule Energies</h2>
+        <table class="pure-table">
+            <thead>
+                <tr>
+                    <th>DftEnergy</th>
+                    <th>HfEnergy</th>
+                    <th>ElectronAffinity</th>
+                    <th>Hardness</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@Model.DftEnergy</td>
+                    <td>@Model.HfEnergy</td>
+                    <td>@Model.ElectronAffinity</td>
+                    <td>@Model.Hardness</td>
+                </tr>
+            </tbody>
+        </table>
+        <h2>Molecule Atom</h2>
+        <table class="pure-table">
+            <thead>
+                <tr>
+                    <th>Nr</th>
+                    <th>S</th>
+                    <th>Mulliken</th>
+                    <th>Lowdin</th>
+                    <th>MullikenAcid</th>
+                    <th>LowdinAcid</th>
+                    <th>MullikenBase</th>
+                    <th>LowdinBase</th>
+                    <th>ChelpGCharge</th>
+                    <th>GeoDiscGCharge</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var atom in Model.Atoms)
+                {
+                    <tr>
+                        <td>@atom.Position</td>
+                        <td>@atom.Symbol</td>
+                        <td>@atom.MullikenCharge</td>
+                        <td>@atom.LowdinCharge</td>
+                        <td>@atom.MullikenPopulationAcid</td>
+                        <td>@atom.LowdinPopulationAcid</td>
+                        <td>@atom.MullikenPopulationBase</td>
+                        <td>@atom.LowdinPopulationBase</td>
+                        <td>@atom.CHelpGCharge</td>
+                        <td>@atom.GeoDiscCharge</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <h2>Molecule Bond</h2>
+        <table class="pure-table">
+            <thead>
+                <tr>
+                    <th>Atom1 - Atom2</th>
+                    <th>Distance</th>
+                    <th>BondOrder</th>
+                    <th>BondOrderAcid</th>
+                    <th>BondOrderBase</th>
+                    <th>Overlap</th>
+                    <th>OverlapAcid</th>
+                    <th>OverlapBase</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var bond in Model.Bonds)
+                {
+                    <tr>
+                        <td>@bond.BondLabel</td>
+                        <td>@bond.Distance</td>
+                        <td>@bond.BondOrder</td>
+                        <td>@bond.BondOrderAcid</td>
+                        <td>@bond.BondOrderBase</td>
+                        <td>@bond.OverlapPopulation</td>
+                        <td>@bond.OverlapPopulationAcid</td>
+                        <td>@bond.OverlapPopulationBase</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <h2>Molecule AtomOrbitals</h2>
+        <ul>
+            @foreach (var atom in Model.Atoms)
+            {
+                <li>
+                    <h3>@atom.Symbol@atom.Position.ToString()</h3>
+                    <table class="pure-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Mulliken</th>
+                                <th>MullikenAcid</th>
+                                <th>MullikenBase</th>
+                                <th>Lowdin</th>
+                                <th>LowdinAcid</th>
+                                <th>LowdinBase</th>
+                            </tr>
+                        </thead>
+                        @foreach (var orb in atom.AtomOrbitals)
+                        {
+                            <tr>
+                                <td>@orb.Symbol@orb.Position.ToString()</td>
+                                <td>@orb.MullikenPopulation</td>
+                                <td>@orb.MullikenPopulationAcid</td>
+                                <td>@orb.MullikenPopulationBase</td>
+                                <td>@orb.LowdinPopulation</td>
+                                <td>@orb.LowdinPopulationAcid</td>
+                                <td>@orb.LowdinPopulationBase</td>
+                            </tr>
+                        }
+                    </table>
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+

@@ -1,0 +1,201 @@
+﻿@page "/moleculecalculationsmanager/{currentcalculationid}/model/{currentmodelid}"
+@inject IChemicalModelService ModelService
+@inject IChemicalCalculationService CalculationService
+@inject IChemicalBasissetService BasisSetService
+@inject NavigationManager NavigationManager
+
+<hr class="line" />
+<div class="container">
+    <section class="row">
+        <div class="col">
+            <div class="d-flex flex-row align-items-center">
+                <h5>Chemical Model</h5>
+                <span class="ml-3">:<a href="moleculemodelcalculations/@CurrentModelId" class="badge badge-light ml-1">Back to @_calculationModel.ChemicalModelName</a></span>
+            </div>
+        </div>
+    </section>
+    <section class="row">
+        <div class="col">
+            <div class="d-flex flex-row align-items-center">
+                <h5>Manage Chemical Calculation</h5><span class="ml-3">: @_calculationModel.Name</span>
+            </div>
+        </div>
+    </section>
+    <section class="row">
+        <div class="col">
+            <EditForm Model="_calculationModel" OnSubmit="@OnHandleSubmitCalculationAsync">
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="calcname">Name:</label>
+                            <InputText class="form-control" id="calcname" @bind-Value="_calculationModel.Name" />
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="calcdescription">Description:</label>
+                            <InputTextArea rows="5" class="form-control" id="calcdescription" @bind-Value="_calculationModel.Description"></InputTextArea>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="calctype">CalculationType:</label>
+                            <InputSelect id="calctype" @bind-Value="_calculationModel.CalculationType">
+                                @foreach (var item in this.CalculationTypes)
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="calcbasisset">Basisset</label>
+                            <InputSelect id="calcbasisset" @bind-Value="_calculationModel.SelectedBasisSet">
+                                @foreach (var item in this.Basissets)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="calcstatus">Calculation Status</label>
+                            <InputSelect id="calcStatus" @bind-Value="_calculationModel.ExecutionStatus">
+                                @foreach (var item in this.CalculationStatusses)
+                                {
+                                    <option value="@item">@item</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="calcgmsinput">Gms Input:</label>
+                            <InputTextArea rows="20" class="form-control" id="calcgmsinput" @bind-Value="_calculationModel.GamessInput"></InputTextArea>
+                        </div>
+                    </div>
+                </div>
+                @if (this.CurrentCalculationId != "0")
+                {
+                    <button type="button" @onclick="@OnDeleteCalculationAsync" class="btn btn-primary">Delete</button>
+                }
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </EditForm>
+        </div>
+    </section>
+    <hr class="line" />
+</div>
+
+@code {
+
+    [Parameter]
+    public string CurrentCalculationId { get; set; }
+
+    [Parameter]
+    public string CurrentModelId { get; set; }
+
+    private ChemicalCalculationInputModel _calculationModel { get; set; }
+
+    private List<BasisSetInfo> Basissets { get; set; } = new List<BasisSetInfo>();
+
+    private List<string> CalculationTypes { get; set; } = new List<string>();
+
+    private List<string> CalculationStatusses { get; set; } = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (int.TryParse(this.CurrentCalculationId, out int calcid))
+        {
+            ChemicalCalculation calc = await this.CalculationService.Get(calcid);
+            if (calc != null)
+            {
+                _calculationModel.Name = calc.Name;
+                _calculationModel.Description = calc.Description;
+                _calculationModel.CalculationType = calc.Type;
+                _calculationModel.ExecutionStatus = calc.Status;
+                _calculationModel.Id = calc.Id;
+                _calculationModel.ModelId = calc.ModelID;
+                _calculationModel.GamessInput = calc.GmsInput;
+                _calculationModel.SelectedBasisSet = calc.BasisSet.Id;
+                var model = await this.ModelService.Get(calc.ModelID);
+                _calculationModel.ChemicalModelName = model.Name;
+            }
+        }
+    }
+
+    private async Task OnHandleSubmitCalculationAsync()
+    {
+        if (int.TryParse(this.CurrentCalculationId, out int calcid))
+        {
+            if (calcid != 0)
+            {
+                ChemicalCalculation calc = await this.CalculationService.Get(calcid);
+                if (calc != null)
+                {
+                    calc.Name = _calculationModel.Name;
+                    calc.Description = _calculationModel.Description;
+                    calc.Status = _calculationModel.ExecutionStatus;
+                    calc.Type = _calculationModel.CalculationType;
+                    calc.ModelID = _calculationModel.ModelId;
+                    calc.BasisSet = (from i in this.Basissets where i.Id == _calculationModel.SelectedBasisSet select i).FirstOrDefault();
+                    calc.GmsInput = _calculationModel.GamessInput;
+                    await this.CalculationService.UpdateAsync(calcid, calc);
+                    this.NavigationManager.NavigateTo($"/moleculecalculationsmanager/{calc.Id}/model/{ calc.ModelID}");
+                }
+            }
+            else
+            {
+                if ( int.TryParse(this.CurrentModelId, out int modelid))
+                {
+                    ChemicalCalculation calc = new ChemicalCalculation()
+                    {
+                        Name = _calculationModel.Name,
+                        BasisSet = (from i in this.Basissets where i.Id == _calculationModel.SelectedBasisSet select i).FirstOrDefault(),
+                        Description = _calculationModel.Description,
+                        GmsInput = _calculationModel.GamessInput,
+                        ModelID = modelid,
+                        Status = _calculationModel.ExecutionStatus,
+                        Type = _calculationModel.CalculationType
+                    };
+                    var calcResult = await this.CalculationService.CreateAsync(calc);
+                    this.NavigationManager.NavigateTo($"/moleculecalculationsmanager/{calcResult.Id}/model/{ calcResult.ModelID}");
+                }
+            }
+
+        }
+    }
+
+    private async Task OnDeleteCalculationAsync()
+    {
+        if (int.TryParse(this.CurrentCalculationId, out int calcid))
+        {
+            await this.CalculationService.DeleteAsync(calcid);
+        }
+    }
+
+    #region helpers
+
+    private async Task InitAsync()
+    {
+        _calculationModel = new ChemicalCalculationInputModel();
+        this.Basissets = await this.BasisSetService.GetAllAsync();
+        this.CalculationTypes = Enum.GetNames(typeof(CalculationType)).ToList();
+        this.CalculationStatusses = Enum.GetNames(typeof(ExecutionStatus)).ToList();
+    }
+
+    #endregion
+
+}
