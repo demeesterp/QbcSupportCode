@@ -1,2 +1,2 @@
 # QbcSupportCode
-For my personal documentation purpose only
+For my personal documentation only
